@@ -5,10 +5,12 @@ import path from 'path';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import http from 'http';
 
 import logger from './utils/logger.js';
 import connectDB from './config/database.js';
 import errorHandler from './middleware/error.js';
+import { initWebSocketServer } from './services/websocket.service.js';
 
 dotenv.config();
 
@@ -77,7 +79,15 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+const wss = initWebSocketServer(server);
+
+// Start the server
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
