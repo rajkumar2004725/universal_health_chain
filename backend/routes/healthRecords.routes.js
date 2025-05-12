@@ -177,23 +177,51 @@ router.post('/:recordId/grant-access',
         body('userId').notEmpty()
     ],
     (req, res) => {
-        const { recordId } = req.params;
-        const { userId } = req.body;
-        
-        if (!userId) {
-            return res.status(400).json({ error: 'UserId is required' });
+        try {
+            console.log('Grant access request received:', req.params, req.body);
+            const { recordId } = req.params;
+            const { userId } = req.body;
+            
+            if (!userId) {
+                return res.status(400).json({ error: 'UserId is required' });
+            }
+            
+            if (!recordId) {
+                return res.status(400).json({ error: 'RecordId is required' });
+            }
+            
+            // Mock implementation for development
+            // In a real implementation, we would update the database and blockchain
+            
+            // For mock data, create a sample file record if it doesn't exist
+            const mockFiles = [
+                {
+                    id: recordId,
+                    name: 'Sample Health Record',
+                    accessList: []
+                }
+            ];
+            
+            // Add the user to the access list if not already there
+            const fileIndex = mockFiles.findIndex(file => file.id === recordId);
+            if (fileIndex !== -1) {
+                if (!mockFiles[fileIndex].accessList.includes(userId)) {
+                    mockFiles[fileIndex].accessList.push(userId);
+                }
+            }
+            
+            // Return success response
+            console.log('Access granted successfully:', { recordId, userId });
+            res.json({
+                message: 'Access granted successfully',
+                recordId,
+                userId,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error granting access:', error);
+            res.status(500).json({ error: 'Failed to grant access', details: error.message });
         }
-        
-        // Mock implementation for development
-        // In a real implementation, we would update the database and blockchain
-        
-        // Return success response
-        res.json({
-            message: 'Access granted successfully',
-            recordId,
-            userId,
-            timestamp: new Date().toISOString()
-        });
     }
 );
 
@@ -203,23 +231,49 @@ router.post('/:recordId/revoke-access',
         body('userId').notEmpty()
     ],
     (req, res) => {
-        const { recordId } = req.params;
-        const { userId } = req.body;
-        
-        if (!userId) {
-            return res.status(400).json({ error: 'UserId is required' });
+        try {
+            console.log('Revoke access request received:', req.params, req.body);
+            const { recordId } = req.params;
+            const { userId } = req.body;
+            
+            if (!userId) {
+                return res.status(400).json({ error: 'UserId is required' });
+            }
+            
+            if (!recordId) {
+                return res.status(400).json({ error: 'RecordId is required' });
+            }
+            
+            // Mock implementation for development
+            // In a real implementation, we would update the database and blockchain
+            
+            // For mock data, create a sample file record if it doesn't exist
+            const mockFiles = [
+                {
+                    id: recordId,
+                    name: 'Sample Health Record',
+                    accessList: [userId] // Assume the user already has access
+                }
+            ];
+            
+            // Remove the user from the access list
+            const fileIndex = mockFiles.findIndex(file => file.id === recordId);
+            if (fileIndex !== -1) {
+                mockFiles[fileIndex].accessList = mockFiles[fileIndex].accessList.filter(id => id !== userId);
+            }
+            
+            // Return success response
+            console.log('Access revoked successfully:', { recordId, userId });
+            res.json({
+                message: 'Access revoked successfully',
+                recordId,
+                userId,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error revoking access:', error);
+            res.status(500).json({ error: 'Failed to revoke access', details: error.message });
         }
-        
-        // Mock implementation for development
-        // In a real implementation, we would update the database and blockchain
-        
-        // Return success response
-        res.json({
-            message: 'Access revoked successfully',
-            recordId,
-            userId,
-            timestamp: new Date().toISOString()
-        });
     }
 );
 
