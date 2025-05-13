@@ -147,4 +147,182 @@ router.get('/health-records/summary',
     }
 );
 
+// Get health statistics
+router.get('/health-stats',
+    authorize('HEALTHCARE_PROVIDER', 'ADMIN', 'PATIENT'),
+    async (req, res) => {
+        try {
+            // Get time period from query params or use default
+            const period = req.query.period || 'month';
+            const userId = req.query.userId || req.user._id;
+            
+            // In a real implementation, you would fetch this data from your database
+            // For now, we'll return mock data
+            res.json({
+                success: true,
+                period,
+                userId,
+                stats: {
+                    vitalSigns: {
+                        averageHeartRate: 72,
+                        averageBloodPressure: '120/80',
+                        averageBloodGlucose: 95,
+                        averageTemperature: 98.6
+                    },
+                    healthMetrics: {
+                        bmi: 24.5,
+                        bodyFatPercentage: 18.2,
+                        cholesterolLevels: {
+                            total: 185,
+                            hdl: 55,
+                            ldl: 110
+                        }
+                    },
+                    activityData: {
+                        averageStepsPerDay: 8500,
+                        averageCaloriesBurned: 2200,
+                        averageSleepHours: 7.5
+                    },
+                    medicalVisits: {
+                        total: 3,
+                        byType: {
+                            'routine-checkup': 1,
+                            'specialist': 1,
+                            'emergency': 0,
+                            'follow-up': 1
+                        }
+                    }
+                },
+                timestamp: new Date()
+            });
+        } catch (error) {
+            console.error('Error fetching health stats:', error);
+            res.status(500).json({ success: false, error: 'Failed to fetch health statistics' });
+        }
+    }
+);
+
+// Get trial statistics
+router.get('/trial-stats',
+    authorize('RESEARCHER', 'ADMIN', 'HEALTHCARE_PROVIDER'),
+    async (req, res) => {
+        try {
+            // Get trial ID from query params
+            const trialId = req.query.trialId;
+            
+            // In a real implementation, you would fetch this data from your database
+            // For now, we'll return mock data
+            res.json({
+                success: true,
+                trialId: trialId || 'all-trials',
+                stats: {
+                    participantMetrics: {
+                        total: 120,
+                        active: 98,
+                        completed: 15,
+                        withdrawn: 7,
+                        demographics: {
+                            ageGroups: [
+                                { group: '18-30', count: 25 },
+                                { group: '31-45', count: 42 },
+                                { group: '46-60', count: 38 },
+                                { group: '61+', count: 15 }
+                            ],
+                            gender: {
+                                male: 65,
+                                female: 53,
+                                other: 2
+                            }
+                        }
+                    },
+                    outcomeMetrics: {
+                        primaryEndpoints: {
+                            success: 72,
+                            failure: 12,
+                            inconclusive: 14,
+                            pending: 22
+                        },
+                        secondaryEndpoints: {
+                            success: 68,
+                            failure: 15,
+                            inconclusive: 17,
+                            pending: 20
+                        }
+                    },
+                    adverseEvents: {
+                        total: 8,
+                        severe: 1,
+                        moderate: 3,
+                        mild: 4
+                    },
+                    complianceRate: 94.5,
+                    dataQualityScore: 92.3
+                },
+                timestamp: new Date()
+            });
+        } catch (error) {
+            console.error('Error fetching trial stats:', error);
+            res.status(500).json({ success: false, error: 'Failed to fetch trial statistics' });
+        }
+    }
+);
+
+// Get user statistics
+router.get('/user-stats',
+    authorize('ADMIN', 'HEALTHCARE_PROVIDER'),
+    async (req, res) => {
+        try {
+            // Get time period from query params
+            const period = req.query.period || 'month';
+            
+            // In a real implementation, you would fetch this data from your database
+            // For now, we'll return mock data
+            res.json({
+                success: true,
+                period,
+                stats: {
+                    userCounts: {
+                        total: 1250,
+                        active: 980,
+                        newUsers: 75,
+                        byRole: {
+                            patient: 950,
+                            doctor: 180,
+                            researcher: 45,
+                            admin: 15,
+                            other: 60
+                        }
+                    },
+                    engagement: {
+                        averageSessionDuration: '8m 45s',
+                        averageSessionsPerUser: 12.3,
+                        mostActiveTimeOfDay: '10:00-12:00',
+                        mostUsedFeatures: [
+                            { feature: 'health-records', usageCount: 4250 },
+                            { feature: 'messaging', usageCount: 3180 },
+                            { feature: 'appointments', usageCount: 2340 },
+                            { feature: 'prescriptions', usageCount: 1980 }
+                        ]
+                    },
+                    platformUsage: {
+                        web: 65,
+                        mobile: 30,
+                        api: 5
+                    },
+                    geographicDistribution: [
+                        { region: 'North America', userCount: 580 },
+                        { region: 'Europe', userCount: 320 },
+                        { region: 'Asia', userCount: 250 },
+                        { region: 'Other', userCount: 100 }
+                    ]
+                },
+                timestamp: new Date()
+            });
+        } catch (error) {
+            console.error('Error fetching user stats:', error);
+            res.status(500).json({ success: false, error: 'Failed to fetch user statistics' });
+        }
+    }
+);
+
 export default router;
