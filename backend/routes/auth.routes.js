@@ -7,6 +7,18 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Log all auth routes
+router.use((req, res, next) => {
+    console.log(`Auth route accessed: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
+// Test route
+router.get('/test', (req, res) => {
+    console.log('Auth test route hit');
+    res.json({ message: 'Auth test route is working!' });
+});
+
 // Register new user
 router.post('/register',
     [
@@ -77,8 +89,10 @@ router.post('/login',
     ],
     async (req, res) => {
         try {
+            console.log('Login request received:', req.body);
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.log('Validation errors:', errors.array());
                 return res.status(400).json({ errors: errors.array() });
             }
 
