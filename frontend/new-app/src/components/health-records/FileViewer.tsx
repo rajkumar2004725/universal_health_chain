@@ -32,6 +32,7 @@ import {
   Person as PersonIcon,
   Add as AddIcon
 } from '@mui/icons-material';
+import Web3 from 'web3';
 import blockchainService from '../../services/blockchain.service';
 import SecureFileUpload from './SecureFileUpload';
 import healthRecordsService from '../../services/health-records.service';
@@ -194,16 +195,14 @@ const FileViewer: React.FC = () => {
 
   // Share file with doctor
   const shareWithDoctor = async () => {
-    console.log('Share button clicked');
     if (!selectedFile || !doctorAddress) {
-      console.log('Missing required data:', { selectedFile, doctorAddress });
-      enqueueSnackbar('Missing file or doctor information', { variant: 'error' });
+      enqueueSnackbar('Please select a file and enter a doctor\'s address', { variant: 'error' });
       return;
     }
     
     try {
-      // Ensure we have a valid file ID
-      const fileId = selectedFile.id || `file-${Date.now()}`;
+      // Generate a unique file ID using the file name and current timestamp
+      const fileId = Web3.utils.sha3(selectedFile.name + Date.now()) || '';
       console.log('Attempting to share file:', { fileId, doctorAddress });
       
       // Verify the doctor's address is valid
@@ -212,9 +211,12 @@ const FileViewer: React.FC = () => {
         throw new Error('Invalid blockchain address for doctor');
       }
       
+      // Calculate expiry time (30 days from now)
+      const expiryTime = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60); // 30 days from now
+      
       // Call the blockchain service to grant access
       console.log('Granting access via blockchain...');
-      await blockchainService.grantAccess(fileId, doctorAddress);
+      await blockchainService.grantAccess(fileId, doctorAddress, expiryTime);
       console.log('Access granted successfully on blockchain');
       
       // Update the file's sharedWith array locally

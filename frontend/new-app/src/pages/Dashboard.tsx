@@ -107,7 +107,7 @@ const Dashboard: React.FC = () => {
         <Grid container spacing={3}>
             <Grid item xs={12}>
                 <Typography variant="h4" gutterBottom>
-                    Welcome back, {user?.profile?.firstName}!
+                    Welcome back, {user?.profile?.firstName || user?.username || 'User'}!
                 </Typography>
                 <Chip
                     label="Patient Dashboard"
@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
         <Grid container spacing={3}>
             <Grid item xs={12}>
                 <Typography variant="h4" gutterBottom>
-                    Welcome, Dr. {user?.profile?.lastName}
+                Welcome, Dr. {user?.profile?.firstName || user?.username || 'User'}!
                 </Typography>
                 <Chip
                     label="Healthcare Provider Dashboard"

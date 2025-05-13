@@ -20,6 +20,7 @@ import SecureFileUpload from '../blockchain/SecureFileUpload';
 interface HealthRecordFormProps {
     recordId?: string;
     onSubmit?: () => void;
+    onCancel?: () => void;
 }
 
 interface HealthRecord {
@@ -50,7 +51,7 @@ type FormSelectEvent = SelectChangeEvent & {
     };
 }
 
-const HealthRecordForm: React.FC<HealthRecordFormProps> = ({ recordId, onSubmit }) => {
+const HealthRecordForm: React.FC<HealthRecordFormProps> = ({ recordId, onSubmit, onCancel = () => {} }) => {
     const [loading, setLoading] = useState(false);
     const [record, setRecord] = useState<HealthRecord>({
         title: '',
@@ -198,7 +199,8 @@ const HealthRecordForm: React.FC<HealthRecordFormProps> = ({ recordId, onSubmit 
                         <Box display="flex" justifyContent="flex-end" gap={2}>
                             <Button
                                 type="button"
-                                onClick={() => window.history.back()}
+                                variant="outlined"
+                                onClick={onCancel}
                             >
                                 Cancel
                             </Button>
@@ -207,7 +209,7 @@ const HealthRecordForm: React.FC<HealthRecordFormProps> = ({ recordId, onSubmit 
                                 variant="contained"
                                 color="primary"
                             >
-                                {recordId ? 'Update Record' : 'Create Record'}
+                                {recordId ? 'Update' : 'Create'} Record
                             </Button>
                         </Box>
                     </Grid>

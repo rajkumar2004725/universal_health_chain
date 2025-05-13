@@ -228,12 +228,12 @@ export class BlockchainService {
         }
     }
 
-    async grantAccess(recordId: string, recipientAddress: string): Promise<any> {
+    async grantAccess(recordId: string, recipientAddress: string, expiryTime: number): Promise<any> {
         await this.checkInitialized();
         try {
             const accounts = await this.web3.eth.getAccounts();
             const from = accounts[0];
-            const method = this.healthRecordContract!.methods.grantAccess(recordId, recipientAddress);
+            const method = this.healthRecordContract!.methods.grantAccess(recordId, recipientAddress, expiryTime);
             const gas = await this.estimateGas(method, from);
             
             return await method.send({ from, gas });

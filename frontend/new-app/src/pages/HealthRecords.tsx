@@ -190,6 +190,7 @@ const HealthRecords: React.FC = () => {
     const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
     const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
+    const [editingRecord, setEditingRecord] = useState<HealthRecord | null>(null);
     const [activeTab, setActiveTab] = useState<number>(0);
     
     const user = useSelector((state: RootState) => state.auth.user);
@@ -344,10 +345,52 @@ const HealthRecords: React.FC = () => {
                             <Grid item xs={12} key={record.id}>
                                 <Card>
                                     <CardContent>
-                                        <HealthRecordForm
-                                            recordId={record.id}
-                                            onSubmit={() => fetchRecords()}
-                                        />
+                                        {editingRecord?.id === record.id ? (
+                                            <HealthRecordForm
+                                                recordId={record.id}
+                                                onSubmit={() => {
+                                                    setEditingRecord(null);
+                                                    fetchRecords();
+                                                }}
+                                                onCancel={() => setEditingRecord(null)}
+                                            />
+                                        ) : (
+                                            <Box>
+                                                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                                    <Box>
+                                                        <Typography variant="h6">{record.title}</Typography>
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            Type: {record.recordType} | 
+                                                            Date: {new Date(record.timestamp).toLocaleDateString()}
+                                                        </Typography>
+                                                        {record.description && (
+                                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                                {record.description}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                    <Box>
+                                                        <Button 
+                                                            size="small" 
+                                                            onClick={() => setEditingRecord(record)}
+                                                            sx={{ mr: 1 }}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                        <Button 
+                                                            size="small" 
+                                                            color="error"
+                                                            onClick={() => {
+                                                                setSelectedRecord(record);
+                                                                setIsDeleteDialogOpen(true);
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </Grid>
