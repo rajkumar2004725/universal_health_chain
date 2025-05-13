@@ -250,6 +250,45 @@ const FileViewer: React.FC = () => {
     }
   };
 
+  // Revoke access from a doctor
+  const revokeDoctorAccess = async (doctorAddress: string) => {
+    if (!selectedFile) return;
+    
+    try {
+      // Generate the same file ID that was used when sharing
+      const fileId = Web3.utils.sha3(selectedFile.name + Date.now()) || '';
+      
+      // Call the blockchain service to revoke access
+      console.log('Revoking access via blockchain...');
+      await blockchainService.revokeAccess(fileId, doctorAddress);
+      console.log('Access revoked successfully on blockchain');
+      
+      // Update the file's sharedWith array locally
+      const updatedFiles = files.map(file => {
+        if (file.id === selectedFile.id) {
+          return {
+            ...file,
+            sharedWith: file.sharedWith.filter(addr => addr !== doctorAddress)
+          };
+        }
+        return file;
+      });
+      
+      setFiles(updatedFiles);
+      
+      // Show success message
+      enqueueSnackbar(`Access revoked successfully.`, { variant: 'success' });
+    } catch (error) {
+      console.error('Error revoking access:', error);
+      enqueueSnackbar(
+        error instanceof Error ? 
+          `Error revoking access: ${error.message}` : 
+          'Failed to revoke access', 
+        { variant: 'error' }
+      );
+    }
+  };
+
   // Format file size for display
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B';
@@ -478,7 +517,31 @@ const FileViewer: React.FC = () => {
                   {selectedFile?.sharedWith.length ? (
                     <Grid item xs={12}>
                       <Typography variant="body2" color="text.secondary">
-                        Shared with: {selectedFile.sharedWith.map(addr => getDoctorName(addr)).join(', ')}
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="subtitle2" gutterBottom>
+                            Shared with:
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {selectedFile.sharedWith.map((address) => (
+                              <Chip
+                                key={address}
+                                icon={<PersonIcon />}
+                                label={getDoctorName(address)}
+                                onDelete={() => revokeDoctorAccess(address)}
+                                color="primary"
+                                variant="outlined"
+                                sx={{ 
+                                  '& .MuiChip-deleteIcon': {
+                                    color: 'error.main',
+                                    '&:hover': {
+                                      color: 'error.dark',
+                                    },
+                                  },
+                                }}
+                              />
+                            ))}
+                          </Box>
+                        </Box>
                       </Typography>
                     </Grid>
                   ) : null}
